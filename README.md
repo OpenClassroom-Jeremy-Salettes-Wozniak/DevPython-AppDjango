@@ -1,0 +1,3 @@
+- Publier des Critiques : Les utilisateurs peuvent écrire et partager leurs avis sur des livres ou des articles.
+- Demander des Critiques : Les utilisateurs peuvent demander des avis sur un livre ou un article spécifique qu'ils souhaitent explorer.
+- Trouver des Lectures Intéressantes : Les utilisateurs peuvent chercher des livres et des articles recommandés en se basant sur les avis et critiques partagés par d'autres.
