@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import UserLoginForm, UserRegistrationForm, DemandeCritiqueForm
 from django.views import View
@@ -20,16 +19,17 @@ class Index(View):
     def post(self, request):
         login_form = UserLoginForm(request.POST)
         if login_form.is_valid():
-            username = login_form.cleaned_data.get('username')
-            password = login_form.cleaned_data.get('password')
-            user = authenticate(request, username=username, password=password)
-            if user is not None:
+            user = authenticate(
+                username=login_form.cleaned_data['username'],
+                password=login_form.cleaned_data['password']
+            )
+            if user:
                 login(request, user)
-                return redirect('flux')  # Rediriger vers une page appropriée après la connexion
+                return redirect('flux')
             else:
-                # Gérer l'échec de connexion
                 return render(request, 'LITReview/index.html', {'login_form': login_form})
-
+        else:
+            return render(request, 'LITReview/index.html', {'login_form': login_form})
 class Register(View):
     def get(self, request):
         registration_form = UserRegistrationForm()
@@ -66,7 +66,7 @@ class ProposerCritique(LoginRequiredMixin, View):
     login_url = '/'
 
     def get(self, request):
-        return render(request, 'LITReview/proposer_critique.html')
+        pass
     
     def post(self, request):
         pass

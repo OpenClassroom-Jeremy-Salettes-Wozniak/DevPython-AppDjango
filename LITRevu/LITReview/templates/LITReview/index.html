@@ -14,13 +14,13 @@
             <h1 class="col text-center mb-4">LITRevu</h1>
         </div>
     </header>
-    <body>
-        <div class="container-fluid row vh-100" style="justify-content: space-evenly;">
-            <div class="inscription m-4 text-center">
+    <main class="container-fluid">
+        <div class="container-fluid row" style="justify-content: space-evenly;">
+            <div class="inscription m-4 text-center" style="width: 45%;">
                 <h2>Inscrivez-vous maintenant</h2>
                 <a href="{% url 'register' %}" class="text-white p-2 btn btn-dark mt-4 col-12">S'inscrire</a>
             </div>
-            <div class="connexion m-4">
+            <div class="connexion m-4" style="width: 45%;">
                 <h2>Connectez-vous</h2>
                 <form method="post" action="">
                     {% csrf_token %}
@@ -28,9 +28,10 @@
                     <button type="submit" class="btn btn-dark mt-4 col-12">Se connecter</button>
                 </form>
             </div> 
-    </body>
-        <footer class="footer container-fluid">
-            <p class="text-center m-4">LITRevu &copy; 2021</p>
-        </footer>
+        </div>
+    </main>
+    <footer class="footer container-fluid">
+        <p class="text-center m-4">LITRevu &copy; 2021</p>
+    </footer>
 </body>
 </html>
