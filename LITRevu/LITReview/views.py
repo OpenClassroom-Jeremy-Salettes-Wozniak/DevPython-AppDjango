@@ -3,8 +3,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import UserLoginForm, UserRegistrationForm, DemandeCritiqueForm
+from .models import Ticket
 from django.views import View
-
 # Create your views here.
 class Disconnect(View):
     def get(self, request):
@@ -12,6 +12,8 @@ class Disconnect(View):
         return redirect('index')
 
 class Index(View):
+    user = User
+
     def get(self, request):
         login_form = UserLoginForm()
         return render(request, 'LITReview/index.html', {'login_form': login_form})
@@ -47,7 +49,9 @@ class Flux(LoginRequiredMixin, View):
     login_url = '/'
 
     def get(self, request):
-        return render(request, 'LITReview/flux.html')
+        # On recupere les demandes de critiques
+        demandes_critiques = Ticket.objects.filter(user=request.user)
+        return render(request, 'LITReview/flux.html', {'demandes_critiques': demandes_critiques})
     
     def post(self, request):
         pass
@@ -57,10 +61,16 @@ class DemandeCritique(LoginRequiredMixin, View):
 
     def get(self, request):
         demande_critique_form = DemandeCritiqueForm()
+
         return render(request, 'LITReview/demande_critique.html', {'demande_critique_form': demande_critique_form})
     
     def post(self, request):
-        pass
+        post_demande_critique_form = DemandeCritiqueForm(request.POST)
+        if post_demande_critique_form.is_valid():
+            demande_critique = post_demande_critique_form.save(commit=False)
+            demande_critique.user = request.user
+            demande_critique.save()
+            return redirect('flux')
 
 class ProposerCritique(LoginRequiredMixin, View):
     login_url = '/'
