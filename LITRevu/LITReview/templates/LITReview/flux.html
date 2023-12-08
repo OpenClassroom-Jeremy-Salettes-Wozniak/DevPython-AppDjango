@@ -42,19 +42,18 @@
         </div>
         <div class="flux">
             {% for demande_critique in demandes_critiques %}
-            <div class="demande_critique border m-4">
+                <div class="demande_critique border m-4">
 
-                {% if demande_critique.image %}
-                    <img src="{{ demande_critique.image }}" alt="image" width="100px" height="100px">
-                {% endif %}
-                <h2>{{ demande_critique.title }}</h2>
-                <pre>{{ demande_critique.description }}</pre>
-                <div style="display: flex; justify-content: space-between;">
-                    <span>{{ demande_critique.user }}</span>
-                    <span>{{ demande_critique.time_created }}</span>
+                    {% if demande_critique.image %}
+                        <img src="{{ demande_critique.image }}" alt="image" width="100px" height="100px">
+                    {% endif %}
+                    <h2>{{ demande_critique.title }}</h2>
+                    <pre>{{ demande_critique.description }}</pre>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>{{ demande_critique.user }}</span>
+                        <span>{{ demande_critique.time_created }}</span>
+                    </div>
                 </div>
-            </div>
-
             {% endfor %}
         </div>
     </body>

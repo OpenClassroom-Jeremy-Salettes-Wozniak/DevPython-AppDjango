@@ -2,8 +2,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .forms import UserLoginForm, UserRegistrationForm, DemandeCritiqueForm
-from .models import Ticket
+from .forms import UserLoginForm, UserRegistrationForm, DemandeCritiqueForm, ProposerCritiqueForm, ProposerReviewForm
+from .models import Ticket, Review
 from django.views import View
 # Create your views here.
 class Disconnect(View):
@@ -51,7 +51,8 @@ class Flux(LoginRequiredMixin, View):
     def get(self, request):
         # On recupere les demandes de critiques
         demandes_critiques = Ticket.objects.filter(user=request.user)
-        return render(request, 'LITReview/flux.html', {'demandes_critiques': demandes_critiques})
+        demandes_reviews = Review.objects.filter(user=request.user)
+        return render(request, 'LITReview/flux.html', {'demandes_critiques': demandes_critiques, 'demandes_reviews': demandes_reviews})
     
     def post(self, request):
         pass
@@ -76,8 +77,22 @@ class ProposerCritique(LoginRequiredMixin, View):
     login_url = '/'
 
     def get(self, request):
-        pass
+        proposer_critique_form = ProposerCritiqueForm()
+        proposer_review_form = ProposerReviewForm()
+        # Rating créer 5 bountons radio de notes pour les ratings
+
+        return render(request, 'LITReview/proposer_critique.html', {'proposer_critique_form': proposer_critique_form, 'proposer_review_form': proposer_review_form})
     
     def post(self, request):
-        pass
+        post_proposer_critique_form = ProposerCritiqueForm(request.POST)
+        post_proposer_review_form = ProposerReviewForm(request.POST)
+        if post_proposer_critique_form.is_valid() and post_proposer_review_form.is_valid():
+            proposer_critique = post_proposer_critique_form.save(commit=False)
+            proposer_critique.user = request.user
+            proposer_critique.save()
+            proposer_review = post_proposer_review_form.save(commit=False)
+            proposer_review.user = request.user
+            proposer_review.ticket = proposer_critique
+            proposer_review.save()
+            return redirect('flux')
 
