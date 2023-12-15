@@ -3,7 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.forms import ModelForm
-from LITReview.models import Ticket, Review
+from LITReview.models import Ticket, Review, UserFollows
 
 # Creation du formulaire semi-autonome de creation de compte
 class UserRegistrationForm(UserCreationForm):
@@ -88,3 +88,9 @@ class ProposerReviewForm(ModelForm):
             'headline': forms.TextInput(attrs={'class': 'form-control'}),
             'body': forms.Textarea(attrs={'class': 'form-control'}),
         }
+
+class UserSearchForm(forms.Form):
+    followed_user = forms.CharField(
+        label="",
+        widget= forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Rechercher un utilisateur'})
+    )

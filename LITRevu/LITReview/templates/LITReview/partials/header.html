@@ -1,0 +1,16 @@
+<header class="header container-fluid  border-bottom">
+    <div class="row align-items-center">
+        <!-- Utilisation de col pour le centrage du titre -->
+        <h1 class="col text-center mb-0">LITRevu</h1>
+
+        <!-- Navigation à droite -->
+        <nav class="col-auto">
+            <ul class="nav">
+                <li class="nav-item"><a class="nav-link" href="{% url 'flux' %}">Flux</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'posts' %}">Posts</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'abonnements' %}">Abonnements</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Déconnexion</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
