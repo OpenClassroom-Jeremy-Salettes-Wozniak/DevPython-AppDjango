@@ -116,25 +116,42 @@ class Abonnements(LoginRequiredMixin, View):
         recherche_form = UserSearchForm()
         # GET : On recupere les user_follows dans lesquels l'utilisateur est le follower
         user_follows = UserFollows.objects.filter(user=request.user)
-        return render(request, 'LITReview/abonnements.html', {'recherche_form': recherche_form, 'user_follows': user_follows})
+        # GET : On vérifie les autres table et si la personne m'a dans ces abonnées on l'affiche
+        all_user_follows = UserFollows.objects.all()
+        followers = []
+        for user_follow in all_user_follows:
+            if user_follow.followed_user == request.user:
+                followers.append(user_follow)
+        return render(request, 'LITReview/abonnements.html', {'recherche_form': recherche_form, 'user_follows': user_follows, 'followers': followers})
+    
         
     def post(self, request):
-        recherche_form = UserSearchForm(request.POST)
-        if recherche_form.is_valid():
-            valeur_recherche = recherche_form.cleaned_data['followed_user']
-            # On verifie si un utilisateur existe dans la db
-            user_followed = User.objects.filter(username=valeur_recherche)
-            # Si il existe un utilisateur
-            if user_followed:
-                # On recupére l'utilisateur
-                user_followed = user_followed[0]
-                # On verifie si l'utilisateur est deja suivi
-                user_follows = UserFollows.objects.filter(user=request.user, followed_user=user_followed)
-                # Si il est deja suivi on ne fait rien
-                if user_follows:
-                    return render(request, 'LITReview/abonnements.html', {'recherche_form': recherche_form})
-                # Sinon on le suit et on le redirige vers la page abonnements
-                else:
-                    user_follow = UserFollows(user=request.user, followed_user=user_followed)
-                    user_follow.save()
-                    return redirect('abonnements')
+        action = request.POST.get('action')
+
+        if action == 'recherche':
+            recherche_form = UserSearchForm(request.POST)
+            if recherche_form.is_valid():
+                valeur_recherche = recherche_form.cleaned_data['followed_user']
+                # On verifie si un utilisateur existe dans la db
+                user_followed = User.objects.filter(username=valeur_recherche)
+                # Si il existe un utilisateur
+                if user_followed:
+                    # On recupére l'utilisateur
+                    user_followed = user_followed[0]
+                    # On verifie si l'utilisateur est deja suivi
+                    user_follows = UserFollows.objects.filter(user=request.user, followed_user=user_followed)
+                    # Si il est deja suivi on ne fait rien
+                    if user_follows:
+                        return render(request, 'LITReview/abonnements.html', {'recherche_form': recherche_form})
+                    # Sinon on le suit et on le redirige vers la page abonnements
+                    else:
+                        user_follow = UserFollows(user=request.user, followed_user=user_followed)
+                        user_follow.save()
+                        return redirect('abonnements')
+        
+        elif action == 'desabonner':
+            user_follow_id = request.POST.get('user_follow_id')
+            user_follow = UserFollows.objects.get(id=user_follow_id)
+            print(user_follow)
+            user_follow.delete()
+            return redirect('abonnements')

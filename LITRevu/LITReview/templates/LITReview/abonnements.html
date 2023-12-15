@@ -6,27 +6,35 @@
 <body>
     {% include 'LITReview/partials/header.html' %}
     {% block search %}
-        <h2>Suivre d'autres utilisateurs</h2>
-        <form method="post" action="{% url 'abonnements' %}" class="d-flex m-2">
+        <h2 class="text-center mt-4">Suivre d'autres utilisateurs</h2>
+        <form method="post" action="{% url 'abonnements' %}" class="d-flex m-4">
             {% csrf_token %}
+            <input type="hidden" name="action" value="recherche">
             {{ recherche_form }}
             <button type="submit" class="btn btn-primary" style="width: 25%">Rechercher</button>
         </form>
     {% endblock %}
     {% block abonnement %}
-        <h2>Abonnements</h2>
-        {% for user_follow in user_follows %}
-        <form method="post" action="{% url 'abonnements' %}" class="d-flex m-2">
-            {% csrf_token %}
-            <input type="hidden" name="followed_user_id" value="{{ user_follow.followed_user.id }}">
-            <input name="followed_user" value="{{ user_follow.followed_user }}" class="form-control">
-            <button type="submit" class="btn btn-primary" style="width: 25%">Se désabonner</button>
-        </form>
-        {% endfor %}
+        <h2 class="text-center">Abonnements</h2>
+    {% for user_follow in user_follows %}
+    <form method="post" action="{% url 'abonnements' %}" class="d-flex m-4">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="desabonner">
+        <input type="hidden" name="user_follow_id" value="{{ user_follow.id }}">
+        <input name="followed_user" value="{{ user_follow.followed_user }}" class="form-control">
+        <button type="submit" class="btn btn-primary" style="width: 25%">Se désabonner</button>
+    </form>
+    {% endfor %}
     {% endblock %}
-        {% comment %} {% block abonnes %}
-            <h2>Abonnés</h2>
-        {% endblock %} {% endcomment %}
+        {% block abonnes %}
+            <h2 class="text-center">Abonnés</h2>
+            {% for follower in followers %}
+            <div class="d-flex m-4">
+                <input type="text" value="{{ follower.user.username }}" class="form-control p-4" disabled>
+            </div>
+            {% endfor %}
+                
+        {% endblock %}
     {% include 'LITReview/partials/footer.html' %}
 </body>
 </html>
