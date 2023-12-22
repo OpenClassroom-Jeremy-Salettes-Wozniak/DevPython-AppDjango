@@ -4,7 +4,22 @@
     <body>
         {% include 'LITReview/partials/header.html' %}
         <main>
-        {% comment %} Votre code {% endcomment %}
+                <div class="container-fluid row" style="justify-content: space-evenly; margin-block: 5%;">
+            <!-- Bouton demander une critique -->
+            <div class="demande">
+                <button type="button" class="btn btn-dark">
+                    <a href="{% url 'demande_critique' %}" class="text-white">Demander une critique</a>
+                </button>
+            </div>
+            <!-- Bouton proposer une critique -->
+            <div class="proposition">
+                <button type="button" class="btn btn-dark">
+                    <a href="{% url 'proposer_critique' %}" class="text-white">Proposer une critique</a>
+                </button>
+            </div>
+        </div>
+        <div class="posts">
+        </div>
         </main>
         {% include 'LITReview/partials/footer.html' %}
     </body>

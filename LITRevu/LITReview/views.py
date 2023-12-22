@@ -49,11 +49,21 @@ class Flux(LoginRequiredMixin, View):
     login_url = '/'
 
     def get(self, request):
-        # On recupere les demandes de critiques
-        demandes_critiques = Ticket.objects.filter(user=request.user)
-        demandes_reviews = Review.objects.filter(user=request.user)
-        return render(request, 'LITReview/flux.html', {'demandes_critiques': demandes_critiques, 'demandes_reviews': demandes_reviews})
-    
+        # ETAPE 1 : On récupère les personnes qui qui l'utilisateur en cours
+        user_follows = UserFollows.objects.filter(user=request.user)
+        # On récupère les noms
+        user_follows = [user_follow.followed_user for user_follow in user_follows]
+        user_follows = [user_follow.username for user_follow in user_follows]
+        # On rajoute l'user en cours dans la liste
+        user_follows.append(request.user.username)
+        # ETAPE 1 BIS : On rajoute l'user en cours dans la liste
+        # La liste doit avoir des valeurs
+        # ETAPE 2 : On récupère tout les ticket et review de tout le monde 
+        tickets = Ticket.objects.all()
+        reviews = Review.objects.all()
+        # ETAPE 3 : J'affiche dans la template les ticket et review des personnes que je suis et moi même
+        return render(request, 'LITReview/flux.html', {'followers': user_follows, 'tickets': tickets, 'reviews': reviews})
+
     def post(self, request):
         pass
 
@@ -103,6 +113,7 @@ class Post(LoginRequiredMixin, View):
         # On recupere les demandes de critiques
         demandes_critiques = Ticket.objects.filter(user=request.user)
         demandes_reviews = Review.objects.filter(user=request.user)
+        
         return render(request, 'LITReview/posts.html', {'demandes_critiques': demandes_critiques, 'demandes_reviews': demandes_reviews})
     
     def post(self, request):
@@ -122,6 +133,7 @@ class Abonnements(LoginRequiredMixin, View):
         for user_follow in all_user_follows:
             if user_follow.followed_user == request.user:
                 followers.append(user_follow)
+
         return render(request, 'LITReview/abonnements.html', {'recherche_form': recherche_form, 'user_follows': user_follows, 'followers': followers})
     
         

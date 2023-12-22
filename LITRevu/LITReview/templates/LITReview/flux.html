@@ -3,39 +3,33 @@
     {% include 'LITReview/partials/head.html' %}
 <body>
     {% include 'LITReview/partials/header.html' %}
-    <body>
-        <div class="container-fluid row" style="justify-content: space-evenly; margin-block: 5%;">
-            <!-- Bouton demander une critique -->
-            <div class="demande">
-                <button type="button" class="btn btn-dark">
-                    <a href="{% url 'demande_critique' %}" class="text-white">Demander une critique</a>
-                </button>
-            </div>
-            <!-- Bouton proposer une critique -->
-            <div class="proposition">
-                <button type="button" class="btn btn-dark">
-                    <a href="{% url 'proposer_critique' %}" class="text-white">Proposer une critique</a>
-                </button>
-            </div>
+    <div class="container-fluid row" style="justify-content: space-evenly; margin-block: 5%;">
+        <!-- Bouton demander une critique -->
+        <div class="demande">
+            <button type="button" class="btn btn-dark">
+                <a href="{% url 'demande_critique' %}" class="text-white">Demander une critique</a>
+            </button>
         </div>
-        <div class="flux">
-            {% for demande_critique in demandes_critiques %}
-                <div class="demande_critique border m-4">
-
-                    {% if demande_critique.image %}
-                        <img src="{{ demande_critique.image }}" alt="image" width="100px" height="100px">
-                    {% endif %}
-                    <h2>{{ demande_critique.title }}</h2>
-                    <pre>{{ demande_critique.description }}</pre>
-                    <div style="display: flex; justify-content: space-between;">
-                        <span>{{ demande_critique.user }}</span>
-                        <span>{{ demande_critique.time_created }}</span>
-                    </div>
-                </div>
-            {% endfor %}
-            {{ demandes_reviews }}
+        <!-- Bouton proposer une critique -->
+        <div class="proposition">
+            <button type="button" class="btn btn-dark">
+                <a href="{% url 'proposer_critique' %}" class="text-white">Proposer une critique</a>
+            </button>
         </div>
-    </body>
+    </div>
+    <div class="flux">
+        {% comment %} affiche dans la template les ticket et review des personnes que je suis et moi même {% endcomment %}
+        {{ followers }}
+        {% for follower in followers %}
+            {{ followers }}
+        {% for ticket in tickets %}
+            {% comment %} {{ follower }} {% endcomment %}
+            {% if ticket.user == follower %}
+                {{ ticket }}
+            {% endif %}
+        {% endfor %}
+        {% endfor %}
+    </div>
     {% include 'LITReview/partials/footer.html' %}
 </body>
 </html>
