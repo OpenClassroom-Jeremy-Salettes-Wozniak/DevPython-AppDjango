@@ -44,29 +44,31 @@ class Register(View):
             return redirect('index')
         else:
             return render(request, 'LITReview/register.html', {'registration_form': registration_form})
-
 class Flux(LoginRequiredMixin, View):
     login_url = '/'
 
     def get(self, request):
-        # ETAPE 1 : On récupère les personnes qui qui l'utilisateur en cours
+        # Je dois recuperer les tickets et les reviews de mes abonnées et de moi meme
+        # GET : On recupere les user_follows dans lesquels l'utilisateur est le follower
         user_follows = UserFollows.objects.filter(user=request.user)
-        # On récupère les noms
-        user_follows = [user_follow.followed_user for user_follow in user_follows]
-        user_follows = [user_follow.username for user_follow in user_follows]
-        # On rajoute l'user en cours dans la liste
-        user_follows.append(request.user.username)
-        # ETAPE 1 BIS : On rajoute l'user en cours dans la liste
-        # La liste doit avoir des valeurs
-        # ETAPE 2 : On récupère tout les ticket et review de tout le monde 
-        tickets = Ticket.objects.all()
-        reviews = Review.objects.all()
-        # ETAPE 3 : J'affiche dans la template les ticket et review des personnes que je suis et moi même
-        return render(request, 'LITReview/flux.html', {'followers': user_follows, 'tickets': tickets, 'reviews': reviews})
+        # GET : On récupere les tickets et les reviews associer au ticket de mes abonnées et de moi meme
+        tickets = Ticket.objects.filter(user=request.user) | Ticket.objects.filter(user__in=user_follows.values('followed_user'))
+        reviews = Review.objects.filter(user=request.user) | Review.objects.filter(user__in=user_follows.values('followed_user'))
+        # On créer une variable qui va regrouper les tickets et les reviews par date
+        flux = []
+        for ticket in tickets:
+            ticket.type = 'Ticket'
+            flux.append(ticket)
+        for review in reviews:
+            review.type = 'Review'
+            flux.append(review)
+        flux.sort(key=lambda x: x.time_created, reverse=True)
 
+        # On affiche les tickets et les reviews
+        return render(request, 'LITReview/flux.html', {'flux': flux})
+    
     def post(self, request):
         pass
-
 class DemandeCritique(LoginRequiredMixin, View):
     login_url = '/'
 
@@ -82,7 +84,6 @@ class DemandeCritique(LoginRequiredMixin, View):
             demande_critique.user = request.user
             demande_critique.save()
             return redirect('flux')
-
 class ProposerCritique(LoginRequiredMixin, View):
     login_url = '/'
 
@@ -105,7 +106,6 @@ class ProposerCritique(LoginRequiredMixin, View):
             proposer_review.ticket = proposer_critique
             proposer_review.save()
             return redirect('flux')
-
 class Post(LoginRequiredMixin, View):
     login_url = '/'
 
@@ -118,7 +118,6 @@ class Post(LoginRequiredMixin, View):
     
     def post(self, request):
         pass
-
 class Abonnements(LoginRequiredMixin, View):
     login_url = '/'
 

@@ -17,19 +17,99 @@
             </button>
         </div>
     </div>
-    <div class="flux">
-        {% comment %} affiche dans la template les ticket et review des personnes que je suis et moi même {% endcomment %}
-        {{ followers }}
-        {% for follower in followers %}
-            {{ followers }}
-        {% for ticket in tickets %}
-            {% comment %} {{ follower }} {% endcomment %}
-            {% if ticket.user == follower %}
-                {{ ticket }}
+        <div class="flux" style="">
+        {% for item in flux %}
+            {% if item.type == 'Ticket' %}
+                <div class="m-4" style="border: 1px solid black; padding: 1%;">
+                    {% comment %} Nom de l'auteur + objet et date de publication {% endcomment %}
+                    <div style="display: flex; justify-content: space-between;">
+                        <span  class="text-muted">{{item.user}} à demandé une critique</span>
+                        <span class="text-muted">{{ item.time_created }}</span>
+                    </div>
+                    {% comment %} Titre {% endcomment %}
+                    <p >{{item.title }}</p>
+                    {% comment %} Description {% endcomment %}
+                    <p>{{ item.description }}</p>
+                    {% comment %} Image {% endcomment %}
+                    {% if item.image %}
+                        <img src="{{ item.image.url }}" alt="image" style="width: 100%; height: auto;">
+                    {% endif %}
+                    {% comment %} Bloquer les critiques aux tickets si un utilisateur a déjà posté une critique en réponse.{% endcomment %}
+                    {% comment %} Sinon on Créer un bouton "Créer une critiqe" {% endcomment %}
+                    <button type="button" class="btn btn-dark">Créer une critique</button>
+                </div>
+                <!-- Afficher d'autres détails du ticket si nécessaire -->
+            {% elif item.type == 'Review' %}
+                <div class="m-4" style="border: 1px solid black; padding: 1%;">
+                    {% comment %} Nom de l'auteur + objet et date de publication {% endcomment %}
+                    <div style="display: flex; justify-content: space-between;">
+                        <span  class="text-muted">{{item.user}} à posté une review</span>   
+                        <span class="text-muted">{{ item.time_created }}</span>
+                    </div>
+                    {% comment %} Note : Créer 5 étoile et en fonction du nombre colorie les etoiles en noire
+                    et les autres en blanc {% endcomment %}
+                    {% if item.rating == 1 %}
+                        <div class="rating">
+                            <span> Null -
+                                <i class="fa-solid fa-star"></i>
+                                <i class="fa-regular fa-star"></i>
+                                <i class="fa-regular fa-star"></i>
+                                <i class="fa-regular fa-star"></i>
+                                <i class="fa-regular fa-star"></i>
+                            </span>
+                        </div>
+                    {% endif %}
+                    {% if item.rating == 2 %}
+                        <div class="rating">
+                            <span> Passable -
+                                <i class="fa-solid fa-star"></i>
+                                <i class="fa-solid fa-star"></i>
+                                <i class="fa-regular fa-star"></i>
+                                <i class="fa-regular fa-star"></i>
+                                <i class="fa-regular fa-star"></i>
+                            </span>
+                        </div>
+                    {% endif %}
+                    {% if item.rating == 3 %}
+                        <div class="rating" style="display: flex;">
+                            <span> Moyen - 
+                                <i class="fa-solid fa-star"></i>
+                                <i class="fa-solid fa-star"></i>
+                                <i class="fa-solid fa-star"></i>
+                                <i class="fa-regular fa-star"></i>
+                                <i class="fa-regular fa-star"></i>
+                            </span>
+                        </div>
+                    {% endif %}
+                    {% if item.rating == 4 %}
+                        <div class="rating">
+                            <span> Excellent -
+                                <i class="fa-solid fa-star"></i>
+                                <i class="fa-solid fa-star"></i>
+                                <i class="fa-solid fa-star"></i>
+                                <i class="fa-solid fa-star"></i>
+                                <i class="fa-regular fa-star"></i>
+                            </span>
+                        </div>
+                    {% endif %}
+                    {% if item.rating == 5 %}
+                        <div class="rating">
+                            <span> Revolutionnaire -
+                                <i class="fa-solid fa-star"></i>
+                                <i class="fa-solid fa-star"></i>
+                                <i class="fa-solid fa-star"></i>
+                                <i class="fa-solid fa-star"></i>
+                                <i class="fa-solid fa-star"></i>
+                            </span>
+                        </div>      
+                    {% endif %}
+                    {% comment %} Image {% endcomment %}
+                    <p>{{ item.headline }}</p>
+                    <p>{{ item.body }}</p>
+                </div>
             {% endif %}
         {% endfor %}
-        {% endfor %}
-    </div>
+        </div>
     {% include 'LITReview/partials/footer.html' %}
 </body>
 </html>
