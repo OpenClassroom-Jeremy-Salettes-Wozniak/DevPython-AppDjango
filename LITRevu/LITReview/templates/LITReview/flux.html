@@ -19,7 +19,9 @@
     </div>
         <div class="flux" style="">
         {% for item in flux %}
-            {% if item.type == 'Ticket' %}
+            {% comment %} Si c'est un ticket et que il n'a pas ForeignKey review {% endcomment %}
+            {% if item.type == 'Ticket' and item.type != 'Review' %}
+                {{ item.review }}
                 <div class="m-4" style="border: 1px solid black; padding: 1%;">
                     {% comment %} Nom de l'auteur + objet et date de publication {% endcomment %}
                     <div style="display: flex; justify-content: space-between;">
@@ -106,6 +108,9 @@
                     {% comment %} Image {% endcomment %}
                     <p>{{ item.headline }}</p>
                     <p>{{ item.body }}</p>
+                    <p>{{ item.ticket.title }}</p>
+                    <image src="{{ item.image_url }}" alt="{{ item.image_url }}" style="width: 100%; height: auto;">
+                    <p>{{ item.ticket.description }}</p>
                 </div>
             {% endif %}
         {% endfor %}
