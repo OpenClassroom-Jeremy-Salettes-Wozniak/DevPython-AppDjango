@@ -2,7 +2,7 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth.models import User
 
-# Create your models here.
+# Soit c'est une demande de critique(Ticket), soit c'est une critique(Ticket) que la personne à poster avec sa review(Critique)
 class Ticket(models.Model):
     title = models.CharField(max_length=128)    
     description = models.TextField(max_length=2048)

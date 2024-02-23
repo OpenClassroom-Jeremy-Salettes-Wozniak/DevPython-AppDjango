@@ -23,8 +23,8 @@ urlpatterns = [
     path('register/', views.Register.as_view(), name='register'),
     path('flux/', views.Flux.as_view(), name='flux'),
     path('logout/', views.Disconnect.as_view(), name='logout'),
+    path('demande_ticket/', views.CreerTicket.as_view(), name='demande_ticket'),
     path('demande_critique/', views.DemandeCritique.as_view(), name='demande_critique'),
-    path('proposer_critique/', views.ProposerCritique.as_view(), name='proposer_critique'),
     path('posts/', views.Post.as_view(), name='posts'),
     path('abonnements/', views.Abonnements.as_view(), name='abonnements'),
 ]

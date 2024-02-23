@@ -38,54 +38,25 @@ class UserLoginForm(forms.Form):
 
         return cleaned_data
     
-# Creation du formulaire autonome de création de ticket
-class DemandeCritiqueForm(ModelForm):
+# Demande de critique(Ticket) ou la critique(Ticket) que la personne à poster avec sa review(Critique)
+class DemandeTicketForm(ModelForm):
     class Meta:
         model = Ticket
         fields = ['title', 'description', 'image']
         widgets = {
-            'title': forms.TextInput(attrs={'class': 'form-control'}),
-            'description': forms.Textarea(attrs={'class': 'form-control'}),
-            'image': forms.FileInput(attrs={'class': 'form-control'}),
-        }
-
-class ProposerCritiqueForm(ModelForm):
-    class Meta:
-        model = Ticket
-        fields = ['title', 'description', 'image']
-        widgets = {
-            # Critique
             'title': forms.TextInput(attrs={'class': 'form-control'}),
             'description': forms.Textarea(attrs={'class': 'form-control'}),
             'image': forms.FileInput(attrs={'class': 'form-control'}),
         }   
 
-class ProposerReviewForm(ModelForm):
-    # Définir les choix de notes
-    NOTE_CHOICES = [
-        (1, '1 Étoile'),
-        (2, '2 Étoiles'),
-        (3, '3 Étoiles'),
-        (4, '4 Étoiles'),
-        (5, '5 Étoiles'),
-    ]
-
-    # Ajouter le champ de notes avec des boutons radio
-    rating = forms.ChoiceField(
-        choices=NOTE_CHOICES, 
-        widget=forms.RadioSelect,
-        label="Votre Note",
-    )
-
+# Répond à une critique(Ticket) avec une review(Critique)
+class ProposerCritiqueForm(ModelForm):
     class Meta:
-        model = Review
+        model =  Review
         fields = ['headline', 'rating', 'body']
-        labels = {
-            'headline': 'Titre',
-            'body': 'Commentaire',
-            }
         widgets = {
             'headline': forms.TextInput(attrs={'class': 'form-control'}),
+            'rating': forms.NumberInput(attrs={'class': 'form-control'}),
             'body': forms.Textarea(attrs={'class': 'form-control'}),
         }
 

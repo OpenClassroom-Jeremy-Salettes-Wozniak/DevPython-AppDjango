@@ -1,3 +1,12 @@
 #id_password1, #id_password2{
     width: 100%;
 }
+
+.cards {
+    margin: 0 auto; /* Added */
+    float: none; /* Added */
+    margin-bottom: 10px; /* Added */
+    border: 0capx solid #000;
+    width: 80%;
+}
+

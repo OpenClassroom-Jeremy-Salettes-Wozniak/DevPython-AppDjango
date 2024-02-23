@@ -1,0 +1,68 @@
+        {% for item in flux %}
+            {% if item.type == 'ticket' %}  
+                <!-- Affichage pour un Ticket -->
+                <div class="ticket card w-50 m-2">
+                    <div class="card-header d-flex justify-content-between">
+                        {% comment %} Si l'user et l'utilisateur en cours  {% endcomment %}
+                        <span>
+                            {% if user == item.user %} Vous avez publié une critique {% else %} 
+                            {{ item.user }} a posté une critique {% endif %}
+                        </span>
+                        {% comment %} Affiche la date de la publication {% endcomment %}
+                        <span class="date">{{ item.time_created }}</span>
+                        {{ item.ticket.rating }}
+                    </div>
+                    {% if item.rating == '1' %} 
+                            <p>Mauvais - ★</p>
+                        {% elif item.rating == '2' %} 
+                            <p>Faible - ★★</p>
+                        {% elif item.rating == '3' %} 
+                            <p>Moyen - ★★★</p>
+                        {% elif item.rating == '4' %} 
+                            <p>Excellent - ★★★★</p>
+                        {% elif item.rating == '5' %} 
+                            <p>véritablement révolutionnaire  - ★★★★★</p>
+                        {% endif %}
+                    <h2>{{ item.title }}</h2>
+                    <p>{{ item.description }}</p>
+                    <!-- Autres détails du ticket... -->
+                </div>
+            {% elif item.type == 'ticket_review' %}
+                <!-- Affichage pour une Review avec ticket -->
+                <div class="review card w-50 m-2">
+                    <div class="card-header d-flex justify-content-between">
+                        {% comment %} Si l'user et l'utilisateur en cours  {% endcomment %}
+                        <span>
+                            {% if user == item.user %} Vous avez publié une critique {% else %} 
+                            {{ item.user }} a posté une critique {% endif %}
+                        </span>
+                        {% comment %} Affiche la date de la publication {% endcomment %}
+                        <span class="date">{{ item.time_created }}</span>
+                    </div>
+                    <h2>{{ item.headline }}</h2>
+                    <p>Note : {{ item.rating }} / 5</p>
+                    <p>{{ item.body }}</p>
+                    <div class="associated-ticket card">
+                        <h3>Ticket associé : {{ item.ticket.title }}</h3>
+                        <!-- Autres détails du ticket associé... -->
+                    </div>
+                </div>
+            {% else %}
+                <!-- Affichage pour une Review seule -->
+                <div class="review card w-50 m-2">
+                    <div class="card-header d-flex justify-content-between">
+                        {% comment %} Si l'user et l'utilisateur en cours  {% endcomment %}
+                        <span>
+                            {% if user == item.user %} Vous avez demandé une critique{% else %} 
+                            {{ item.user }} a demandé une critique{% endif %}
+                        </span>
+                        {% comment %} Affiche la date de la publication {% endcomment %}
+                        <span class="date">{{ item.time_created }}</span>
+                    </div>
+                    <h2>{{item.user}}</h2>
+                    <h2>{{ item.headline }}</h2>
+                    <p>Note : {{ item.rating }}</p>
+                    <p>{{ item.body }}</p>
+                </div>
+            {% endif %}
+        {% endfor %}

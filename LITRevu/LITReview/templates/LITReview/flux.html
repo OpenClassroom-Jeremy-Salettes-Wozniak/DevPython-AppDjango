@@ -3,118 +3,63 @@
     {% include 'LITReview/partials/head.html' %}
 <body>
     {% include 'LITReview/partials/header.html' %}
-    <div class="container-fluid row" style="justify-content: space-evenly; margin-block: 5%;">
+    <div class="container-fluid d-flex" style="justify-content: space-evenly; margin-block: 5%;">
+            <!-- Bouton proposer une critique -->
+        <div class="proposition">
+            <button type="button" class="btn btn-dark">
+                <a href="{% url 'demande_critique' %}" class="text-white">Demander une Critique</a>
+        </button>
+        </div>
         <!-- Bouton demander une critique -->
         <div class="demande">
             <button type="button" class="btn btn-dark">
-                <a href="{% url 'demande_critique' %}" class="text-white">Demander une critique</a>
-            </button>
-        </div>
-        <!-- Bouton proposer une critique -->
-        <div class="proposition">
-            <button type="button" class="btn btn-dark">
-                <a href="{% url 'proposer_critique' %}" class="text-white">Proposer une critique</a>
+                <a href="{% url 'demande_ticket' %}" class="text-white">Créer une Critique</a>
             </button>
         </div>
     </div>
-        <div class="flux" style="">
+    <div class="flux d-flex flex-column align-items-center">
         {% for item in flux %}
-            {% comment %} Si c'est un ticket et que il n'a pas ForeignKey review {% endcomment %}
-            {% if item.type == 'Ticket' and item.type != 'Review' %}
-                {{ item.review }}
-                <div class="m-4" style="border: 1px solid black; padding: 1%;">
-                    {% comment %} Nom de l'auteur + objet et date de publication {% endcomment %}
-                    <div style="display: flex; justify-content: space-between;">
-                        <span  class="text-muted">{{item.user}} à demandé une critique</span>
-                        <span class="text-muted">{{ item.time_created }}</span>
+            {% if item.type == "ticket" %}
+                <div class="publication border border-dark rounded p-3 w-50 m-2">  
+                    <div class="publication-user d-flex justify-content-between  p-2">
+                        <span>{% if item.user == user %}Vous avez demandé une critique{% else %}{{ item.user }} a demandé une critique{% endif %}</span>
+                        <span>{{ item.time_created }}</span> 
+                    </div>   
+                    <div class="publication-content  p-2">
+                        <div>{{ item.title }}</div>
+                        <div>{{ item.body }}</div>  
+                        <div>{{ item.image }}</div>
                     </div>
-                    {% comment %} Titre {% endcomment %}
-                    <p >{{item.title }}</p>
-                    {% comment %} Description {% endcomment %}
-                    <p>{{ item.description }}</p>
-                    {% comment %} Image {% endcomment %}
-                    {% if item.image %}
-                        <img src="{{ item.image.url }}" alt="image" style="width: 100%; height: auto;">
+                    {% if not item.is_associated %}
+                        {% comment %} Formulaire qui envoie l'objet dans sont ensemble au lien {% endcomment %}
+                        <form action="create" method="post" class="d-flex p-2">
+                            {% csrf_token %}
+                            <input type="hidden" name="ticket" value="{{ item }}">
+                            <button type="submit" class="btn btn-dark">Créer une critique</button>
+                        </form>
                     {% endif %}
-                    {% comment %} Bloquer les critiques aux tickets si un utilisateur a déjà posté une critique en réponse.{% endcomment %}
-                    {% comment %} Sinon on Créer un bouton "Créer une critiqe" {% endcomment %}
-                    <button type="button" class="btn btn-dark">Créer une critique</button>
+
                 </div>
-                <!-- Afficher d'autres détails du ticket si nécessaire -->
-            {% elif item.type == 'Review' %}
-                <div class="m-4" style="border: 1px solid black; padding: 1%;">
-                    {% comment %} Nom de l'auteur + objet et date de publication {% endcomment %}
-                    <div style="display: flex; justify-content: space-between;">
-                        <span  class="text-muted">{{item.user}} à posté une review</span>   
-                        <span class="text-muted">{{ item.time_created }}</span>
+            {% elif item.type == "ticket_critique" %}
+                <div class="publication border border-dark rounded p-3 w-50 m-2">
+                    <div class="publication-user d-flex justify-content-between p-2">
+                        <span>{% if item.user == user %}Vous avez publié une critique{% else %}{{ item.user }} a publié une critique{% endif %}</span>
+                        <span>{{ item.time_created }}</span>
                     </div>
-                    {% comment %} Note : Créer 5 étoile et en fonction du nombre colorie les etoiles en noire
-                    et les autres en blanc {% endcomment %}
-                    {% if item.rating == 1 %}
-                        <div class="rating">
-                            <span> Null -
-                                <i class="fa-solid fa-star"></i>
-                                <i class="fa-regular fa-star"></i>
-                                <i class="fa-regular fa-star"></i>
-                                <i class="fa-regular fa-star"></i>
-                                <i class="fa-regular fa-star"></i>
-                            </span>
-                        </div>
-                    {% endif %}
-                    {% if item.rating == 2 %}
-                        <div class="rating">
-                            <span> Passable -
-                                <i class="fa-solid fa-star"></i>
-                                <i class="fa-solid fa-star"></i>
-                                <i class="fa-regular fa-star"></i>
-                                <i class="fa-regular fa-star"></i>
-                                <i class="fa-regular fa-star"></i>
-                            </span>
-                        </div>
-                    {% endif %}
-                    {% if item.rating == 3 %}
-                        <div class="rating" style="display: flex;">
-                            <span> Moyen - 
-                                <i class="fa-solid fa-star"></i>
-                                <i class="fa-solid fa-star"></i>
-                                <i class="fa-solid fa-star"></i>
-                                <i class="fa-regular fa-star"></i>
-                                <i class="fa-regular fa-star"></i>
-                            </span>
-                        </div>
-                    {% endif %}
-                    {% if item.rating == 4 %}
-                        <div class="rating">
-                            <span> Excellent -
-                                <i class="fa-solid fa-star"></i>
-                                <i class="fa-solid fa-star"></i>
-                                <i class="fa-solid fa-star"></i>
-                                <i class="fa-solid fa-star"></i>
-                                <i class="fa-regular fa-star"></i>
-                            </span>
-                        </div>
-                    {% endif %}
-                    {% if item.rating == 5 %}
-                        <div class="rating">
-                            <span> Revolutionnaire -
-                                <i class="fa-solid fa-star"></i>
-                                <i class="fa-solid fa-star"></i>
-                                <i class="fa-solid fa-star"></i>
-                                <i class="fa-solid fa-star"></i>
-                                <i class="fa-solid fa-star"></i>
-                            </span>
-                        </div>      
-                    {% endif %}
-                    {% comment %} Image {% endcomment %}
-                    <p>{{ item.headline }}</p>
-                    <p>{{ item.body }}</p>
-                    <p>{{ item.ticket.title }}</p>
-                    <image src="{{ item.image_url }}" alt="{{ item.image_url }}" style="width: 100%; height: auto;">
-                    <p>{{ item.ticket.description }}</p>
+                    <div class="publication-rating d-flex  p-2">
+                        <span>{{ item.headline }} - {% if item.rating == 1 %} <span class="rating">★☆☆☆☆</span> {% elif item.rating == 2 %} <span class="rating">★★☆☆☆</span> {% elif item.rating == 3 %} <span class="rating">★★★☆☆</span> {% elif item.rating == 4 %} <span class="rating">★★★★☆</span> {% elif item.rating == 5 %} <span class="rating">★★★★★</span> {% endif %}</span>
+                    </div>
+                    <div class="publication-content border border-dark rounded p-3 m-2">
+                        <div>Ticket - {{ item.ticket.user }}</div>
+                        <span>{{ item.body }}</span>
+                        <div>{{ item.ticket.title }}</div>
+                        <div>{{ item.ticket.image }}</div>
+                    </div>
                 </div>
             {% endif %}
         {% endfor %}
-        </div>
+    </div>
+
     {% include 'LITReview/partials/footer.html' %}
 </body>
 </html>

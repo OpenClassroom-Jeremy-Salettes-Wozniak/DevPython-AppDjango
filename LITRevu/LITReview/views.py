@@ -2,15 +2,16 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .forms import UserLoginForm, UserRegistrationForm, DemandeCritiqueForm, ProposerCritiqueForm, ProposerReviewForm, UserSearchForm
+from .forms import UserLoginForm, UserRegistrationForm, ProposerCritiqueForm, DemandeTicketForm, UserSearchForm
 from .models import Ticket, Review, UserFollows
 from django.views import View
+# Explication : Q permet de faire des requetes complexes de type OR
+from django.db.models import Q, Exists, OuterRef
 # Create your views here.
 class Disconnect(View):
     def get(self, request):
         logout(request)
         return redirect('index')
-
 class Index(View):
     user = User
 
@@ -48,64 +49,99 @@ class Flux(LoginRequiredMixin, View):
     login_url = '/'
 
     def get(self, request):
-        # Je dois recuperer les tickets et les reviews de mes abonnées et de moi meme
-        # GET : On recupere les user_follows dans lesquels l'utilisateur est le follower
         user_follows = UserFollows.objects.filter(user=request.user)
-        # GET : On récupere les tickets et les reviews associer au ticket de mes abonnées et de moi meme
-        tickets = Ticket.objects.filter(user=request.user) | Ticket.objects.filter(user__in=user_follows.values('followed_user'))
-        reviews = Review.objects.filter(user=request.user) | Review.objects.filter(user__in=user_follows.values('followed_user'))
-        # On créer une variable qui va regrouper les tickets et les reviews par date
-        flux = []
-        for ticket in tickets:
-            ticket.type = 'Ticket'
-            flux.append(ticket)
-        for review in reviews:
-            review.type = 'Review'
-            flux.append(review)
+
+        # Récupérer les tickets et les reviews de l'utilisateur et de ses abonnés
+        user_tickets = Ticket.objects.filter(Q(user=request.user) | Q(user__followed_by__user=request.user))
+        user_reviews = Review.objects.filter(Q(user=request.user) | Q(user__followed_by__user=request.user))
+        # Initialiser les listes
+        ticket_critique = []
+        ticket_only = []
+
+        Ticket.objects.all().annotate(
+            is_associated=Exists(Review.objects.filter(ticket=OuterRef('pk')))
+        )
+        # Parcourir les tickets et verifie si il y a un review et si il correspond à l'id d'un user_review
+        for ticket in user_tickets:
+            # Pour chaque ticket on verifie si il y a un review associé si il n'y en a pas on l'ajoute à la liste des tickets seuls
+            if not Review.objects.filter(ticket=ticket):
+                ticket_only.append(ticket)
+            else:
+                # Sinon on ajoute la review qui à pour ticket id le ticket
+                ticket_critique.append(Review.objects.get(ticket=ticket))
+
+
+        # Ajoute une valeur a chaque liste pour les differentier dans la template 
+        for ticket in ticket_only:
+            ticket.type = "ticket"
+        for review in ticket_critique:
+            review.type = "ticket_critique"
+
+        # Créer une liste combinée pour le flux
+        flux = list(ticket_only) + list(ticket_critique)
         flux.sort(key=lambda x: x.time_created, reverse=True)
 
-        # On affiche les tickets et les reviews
         return render(request, 'LITReview/flux.html', {'flux': flux})
+
+            
+    def post(self, request):
+        # Recupere le formulaire post de la page ticket_id
+        action = request.POST.get('action')
+        ticket = request.POST.get('ticket')
+        
+        if action == 'create':
+            return render(request, 'LITReview/demande_ticket.html', {'ticket': ticket})
+        else:
+            return redirect('flux')
+        
+class CreerTicket(LoginRequiredMixin, View):
+    login_url = '/'
+
+    def get(self, request):
+        demande_ticket_form = DemandeTicketForm()
+        demande_critique_form = ProposerCritiqueForm()
+
+        return render(request, 'LITReview/demande_ticket.html', {
+            'demande_ticket_form': demande_ticket_form,
+            'demande_critique_form': demande_critique_form
+            })
     
     def post(self, request):
-        pass
+        post_demande_ticket_form = DemandeTicketForm(request.POST, request.FILES)
+        post_demande_critique_form = ProposerCritiqueForm(request.POST)
+        if post_demande_ticket_form.is_valid() and post_demande_critique_form.is_valid():
+            # On recupere le ticket de la demande de critique
+            demande_ticket = post_demande_ticket_form.save(commit=False)
+            # On recupere l'utilisateur
+            demande_ticket.user = request.user
+            # On sauvegarde le ticket
+            demande_ticket.save()
+            # On recupere la critique de la demande de critique
+            demande_critique = post_demande_critique_form.save(commit=False)
+            # On recupere l'utilisateur
+            demande_critique.user = request.user
+            # On sauvegarde la critique
+            demande_critique.ticket = demande_ticket
+            demande_critique.save()
+
+        return redirect('flux')
 class DemandeCritique(LoginRequiredMixin, View):
     login_url = '/'
 
     def get(self, request):
-        demande_critique_form = DemandeCritiqueForm()
-
+        demande_critique_form = DemandeTicketForm()
         return render(request, 'LITReview/demande_critique.html', {'demande_critique_form': demande_critique_form})
     
     def post(self, request):
-        post_demande_critique_form = DemandeCritiqueForm(request.POST)
+        post_demande_critique_form = DemandeTicketForm(request.POST)
+
         if post_demande_critique_form.is_valid():
             demande_critique = post_demande_critique_form.save(commit=False)
             demande_critique.user = request.user
             demande_critique.save()
-            return redirect('flux')
-class ProposerCritique(LoginRequiredMixin, View):
-    login_url = '/'
-
-    def get(self, request):
-        proposer_critique_form = ProposerCritiqueForm()
-        proposer_review_form = ProposerReviewForm()
-        # Rating créer 5 bountons radio de notes pour les ratings
-
-        return render(request, 'LITReview/proposer_critique.html', {'proposer_critique_form': proposer_critique_form, 'proposer_review_form': proposer_review_form})
+        return redirect('flux')
     
-    def post(self, request):
-        post_proposer_critique_form = ProposerCritiqueForm(request.POST)
-        post_proposer_review_form = ProposerReviewForm(request.POST)
-        if post_proposer_critique_form.is_valid() and post_proposer_review_form.is_valid():
-            proposer_critique = post_proposer_critique_form.save(commit=False)
-            proposer_critique.user = request.user
-            proposer_critique.save()
-            proposer_review = post_proposer_review_form.save(commit=False)
-            proposer_review.user = request.user
-            proposer_review.ticket = proposer_critique
-            proposer_review.save()
-            return redirect('flux')
+
 class Post(LoginRequiredMixin, View):
     login_url = '/'
 
@@ -119,6 +155,7 @@ class Post(LoginRequiredMixin, View):
     def post(self, request):
         pass
 class Abonnements(LoginRequiredMixin, View):
+
     login_url = '/'
 
     def get(self, request):
@@ -166,3 +203,5 @@ class Abonnements(LoginRequiredMixin, View):
             print(user_follow)
             user_follow.delete()
             return redirect('abonnements')
+        
+    
