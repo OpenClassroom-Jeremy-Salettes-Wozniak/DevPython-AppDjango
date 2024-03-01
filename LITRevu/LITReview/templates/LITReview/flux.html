@@ -8,7 +8,7 @@
         <div class="proposition">
             <button type="button" class="btn btn-dark">
                 <a href="{% url 'demande_critique' %}" class="text-white">Demander une Critique</a>
-        </button>
+            </button>
         </div>
         <!-- Bouton demander une critique -->
         <div class="demande">
@@ -27,16 +27,15 @@
                     </div>   
                     <div class="publication-content  p-2">
                         <div>{{ item.title }}</div>
-                        <div>{{ item.body }}</div>  
-                        <div>{{ item.image }}</div>
+                        <div>{{ item.description }}</div>
+                        {% if item.images %}
+                            <img src="{{ item.images.url }}" alt="Image du ticket" class="img-fluid">
+                        {% endif %}
                     </div>
                     {% if not item.is_associated %}
-                        {% comment %} Formulaire qui envoie l'objet dans sont ensemble au lien {% endcomment %}
-                        <form action="create" method="post" class="d-flex p-2">
-                            {% csrf_token %}
-                            <input type="hidden" name="ticket" value="{{ item }}">
-                            <button type="submit" class="btn btn-dark">Créer une critique</button>
-                        </form>
+                        <button type="button" class="btn btn-dark">
+                            <a href="{% url 'reponse_ticket' item.id %}" class="text-white">Répondre</a>
+                        </button>
                     {% endif %}
 
                 </div>

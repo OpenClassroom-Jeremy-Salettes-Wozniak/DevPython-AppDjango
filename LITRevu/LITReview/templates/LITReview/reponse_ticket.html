@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+    {% include 'LITReview/partials/head.html' %}
+<body>
+    {% include 'LITReview/partials/header.html' %}
+    <div class="container">
+        <h2 class="text-center m-4">Réponse à un ticket</h2>
+        <div class="inscription">
+            <form method="post" action="create_ticket">
+                {% csrf_token %}
+                <div class="fa-border p-2">
+                    <span class="" title="">Vous êtes en train de poster en réponse à</span>
+                    <div class="p-2 fa-border">
+                        <div class="publication-user d-flex justify-content-between">
+                            <span>{{ ticket.user.username }} a demandé une critique</span>
+                            <span>{{ ticket.time_created }}</span>
+                        </div>
+                        <div class="">
+                            <p>{{ ticket.title }}</p>
+                            <p>{{ ticket.description }}</p>
+                            {% comment %} Image {% endcomment %}
+                            {% if ticket.images %}
+                                <img src="{{ ticket.images.url }}" alt="Image du ticket" class="img-fluid">
+                            {% endif %}
+                    </div>
+                </div>
+                <div class="fa-border p-2">
+                    <h3>Critique</h3>
+                    {{demande_ticket_form.as_p}}
+                    <input type="submit" value="Envoyer" class="btn btn-dark w-100">
+                </div>
+            </form>
+        </div>
+    </div>
+    {% include 'LITReview/partials/footer.html' %}
+</body>
+</html>

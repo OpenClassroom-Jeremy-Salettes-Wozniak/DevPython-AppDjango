@@ -42,11 +42,11 @@ class UserLoginForm(forms.Form):
 class DemandeTicketForm(ModelForm):
     class Meta:
         model = Ticket
-        fields = ['title', 'description', 'image']
+        fields = ['title', 'description', 'images']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control'}),
             'description': forms.Textarea(attrs={'class': 'form-control'}),
-            'image': forms.FileInput(attrs={'class': 'form-control'}),
+            'images': forms.FileInput(attrs={'class': 'form-control'}),
         }   
 
 # Répond à une critique(Ticket) avec une review(Critique)

@@ -88,7 +88,7 @@ class Flux(LoginRequiredMixin, View):
         # Recupere le formulaire post de la page ticket_id
         action = request.POST.get('action')
         ticket = request.POST.get('ticket')
-        
+            
         if action == 'create':
             return render(request, 'LITReview/demande_ticket.html', {'ticket': ticket})
         else:
@@ -141,6 +141,17 @@ class DemandeCritique(LoginRequiredMixin, View):
             demande_critique.save()
         return redirect('flux')
     
+class ReponseTicket(LoginRequiredMixin, View):
+    login_url = '/'
+
+    def get(self, request, ticket_id):
+        # On recupere le ticket
+        ticket = Ticket.objects.get(id=ticket_id)
+        demande_ticket_form = ProposerCritiqueForm()
+        return render(request, 'LITReview/reponse_ticket.html', {'ticket': ticket, 'demande_ticket_form': demande_ticket_form})
+    
+    def post(self, request):
+        pass
 
 class Post(LoginRequiredMixin, View):
     login_url = '/'
